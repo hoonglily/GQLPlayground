@@ -111,16 +111,52 @@ const RootQuery = new GraphQLObjectType({
 		CountryNews: {
 			type: CountryNewsType,
 			args: { id: { type: GraphQLString } },
-			resolve(parent, args, context, info) {
-				return fetch(
-					`https://newsdata.io/api/1/news?apikey=pub_17860d5d4de387f07197443f4724ec938c4f9&country=${args}`,
-					{
+			async resolve(parent, args, context, info) {
+				try {
+					// fetch address is entered incorrectly (missing "i" after "swap")
+					const response = await fetch(
+						`https://newsdata.io/api/1/news?apikey=pub_17860d5d4de387f07197443f4724ec938c4f9&country=${args}`,
+						{
+							headers: {
+								API_key: "pub_17860d5d4de387f07197443f4724ec938c4f9",
+								"content-type": "application/json",
+							},
+						}
+						`https://swapi.dev/api/people/${args.id}`,
+					);
+					const news = await response.json();
+					//npm-function(response,film)/////////////////////////////////////////////////////
+					const responseObj = {
+						argId: args.id,
+						alias: info.path.key,
+						parentNode: info.fieldName,
+						originResp: news,
+						originRespStatus: response.status,
+						originRespMessage: response.statusText,
+					};
+
+					console.log("RESPONSE OBJECT: ", responseObj);
+
+					fetch("http://localhost:3000/originalRespReceiver", {
+						method: "POST",
 						headers: {
-							API_key: "pub_17860d5d4de387f07197443f4724ec938c4f9",
-							"content-type": "application/json",
+							"Content-Type": "application/json",
+							// 'Content-Type': 'application/x-www-form-urlencoded',
 						},
-					}
-				).then((res) => res.json());
+						body: JSON.stringify(responseObj),
+					})
+						.then((data) => {
+							return data.json();
+						})
+						.then((resp) => {
+							console.log("originresp: ", resp);
+						});
+						////////////
+					return news;
+				} catch (err) {
+					console.error("Error fetching person:", err);
+					throw new Error("Unable to fetch person");
+				}
 			},
 		},
 	},
