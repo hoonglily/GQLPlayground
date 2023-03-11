@@ -154,8 +154,8 @@ const RootQuery = new GraphQLObjectType({
 						////////////
 					return news;
 				} catch (err) {
-					console.error("Error fetching person:", err);
-					throw new Error("Unable to fetch person");
+					console.error("Error fetching news:", err);
+					throw new Error("Unable to fetch news");
 				}
 			},
 		},

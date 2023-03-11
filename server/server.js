@@ -23,7 +23,7 @@ app.use(
 					"Content-Type": "application/json",
 					// 'Content-Type': 'application/x-www-form-urlencoded',
 				},
-				body: JSON.stringify({ schema: schema, queryResp: result }),
+				body: JSON.stringify({ queryResp: result }),
 			})
 				.then((data) => {
 					return data.json();
