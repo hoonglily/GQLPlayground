@@ -73,13 +73,13 @@ const RootQuery = new GraphQLObjectType({
 							headers: { "content-type": "application/json" }
 						},
 					);
-					const film = await response.json();
+					const person = await response.json();
 					//npm-function(response,film)/////////////////////////////////////////////////////
 					const responseObj = {
 						argId: args.id,
 						alias: info.path.key,
 						parentNode: info.fieldName,
-						originResp: film,
+						originResp: person,
 						originRespStatus: response.status,
 						originRespMessage: response.statusText,
 					};
@@ -100,7 +100,8 @@ const RootQuery = new GraphQLObjectType({
 						.then((resp) => {
 							console.log("originresp: ", resp);
 						});
-					return film;
+						////////////
+					return person;
 				} catch (err) {
 					console.error("Error fetching person:", err);
 					throw new Error("Unable to fetch person");
