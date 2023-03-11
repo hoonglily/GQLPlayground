@@ -61,17 +61,52 @@ const RootQuery = new GraphQLObjectType({
 				}
 			},
 		},
-		// Person: {
-		// 	type: SwapiPersonType,
-		// 	args: { id: { type: GraphQLString } },
-		// async resolve(parent, args, context, info) {
-		// 	try{
+		Person: {
+			type: SwapiPersonType,
+			args: { id: { type: GraphQLString } },
+			async resolve(parent, args, context, info) {
+				try {
+					// fetch address is entered incorrectly (missing "i" after "swap")
+					const response = await fetch(
+						`https://swapi.dev/api/people/${args.id}`, 
+						{
+							headers: { "content-type": "application/json" }
+						},
+					);
+					const film = await response.json();
+					//npm-function(response,film)/////////////////////////////////////////////////////
+					const responseObj = {
+						argId: args.id,
+						alias: info.path.key,
+						parentNode: info.fieldName,
+						originResp: film,
+						originRespStatus: response.status,
+						originRespMessage: response.statusText,
+					};
 
-		// 	return fetch(`https://swapi.dev/api/people/${args.id}`, {
-		// 		headers: { "content-type": "application/json" },
-		// 	})
-		// },
-		// },
+					console.log("RESPONSE OBJECT: ", responseObj);
+
+					fetch("http://localhost:3000/originalRespReceiver", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							// 'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: JSON.stringify(responseObj),
+					})
+						.then((data) => {
+							return data.json();
+						})
+						.then((resp) => {
+							console.log("originresp: ", resp);
+						});
+					return film;
+				} catch (err) {
+					console.error("Error fetching person:", err);
+					throw new Error("Unable to fetch person");
+				}
+			},
+		},
 		CountryNews: {
 			type: CountryNewsType,
 			args: { id: { type: GraphQLString } },
